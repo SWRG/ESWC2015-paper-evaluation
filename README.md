@@ -20,11 +20,9 @@ The datasets used for the evaluation can be downloaded from the links below:
 * The 50% DBPEDIA dataset: http://benchmark.dbpedia.org/benchmark_50.nt.bz2
 * The 10% DBPEDIA dataset: http://benchmark.dbpedia.org/benchmark_10.nt.bz2
 
-The 1% DBPEDIA dataset can be created from the 10% dataset by keeping the first 1537384 triples. This is done by using the split command
+The 1% DBPEDIA dataset can be created from the 10% dataset by keeping the first 1537384 triples. This is done by using the head command:
 
-    split -l 1537384 benchmark_10.nt
-
-and keeping the first output file. The file should be renamed to 'benchmark_1.nt'.
+    head -1537384 benchmark_10.nt > benchmark_1.nt
 
 ###Automated evaluation script
 We have prepared a script that takes as input the 4 DBPEDIA datasets (namely benchmark_1.nt, benchmark_10.nt, benchmark_50.nt and benchmark_100.nt) and creates all RDF-type summary graphs, executes the example query against the graphs, measures execution time and creates the scalability plot. The script can be found at [automated_evaluation.py](https://github.com/SWRG/ESWC2015-paper-evaluation/blob/master/automated_evaluation.py).
