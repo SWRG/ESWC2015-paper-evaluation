@@ -77,7 +77,6 @@ class RDFTypeSummary():
         print "Executing query:"
         print q_source,q_predicate,q_target
 
-
         # find q_predicate that touches q_source
         ets=[(e[0],e[2]['label'],e[1]) for e in self.db_graph.out_edges_iter([q_source],data=True, keys=False)]
 
