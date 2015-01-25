@@ -4,7 +4,7 @@ The time measurements were taken by running the scripts on a desktop computer ha
 * CPU: AMD Phenom II X4 965
 * RAM: 12GB DDR3
 * OS: Ubuntu Linux 14.04, kernel version: 3.13.0-44-generic
-* Packages: Python 2.7.9 (64bit), networkx v1.8, gnuplot v4.6
+* Packages: Python 2.7.9 (64bit), networkx v1.8, librdf, gnuplot v4.6
 
 ##Querying the RDF-type Summary Graph
 The execution of a query against an RDF-type summary graph consists of three steps:
@@ -258,9 +258,9 @@ The 1% DBPEDIA dataset can be created from the 10% dataset by keeping the first 
 
 ##Automated evaluation script
 We have prepared a script that takes as input the 4 DBPEDIA datasets (namely benchmark_1.nt, benchmark_10.nt, benchmark_50.nt and benchmark_100.nt) and creates all RDF-type summary graphs, executes the example query against the graphs, measures execution time and creates the scalability plot. The script can be found at [automated_evaluation.py](https://github.com/SWRG/ESWC2015-paper-evaluation/blob/master/automated_evaluation.py).
-Before executing the script make sure networkx and gnuplot are installed in the system. To install these packages on an Ubuntu 14.04 platform, just give the following command:
+Before executing the script make sure networkx, librdf and gnuplot are installed in the system. To install these packages on an Ubuntu 14.04 platform, just give the following command:
 
-    sudo apt-get install gnuplot, python-networkx
+    sudo apt-get install gnuplot, python-networkx, python-librdf
 
 The dataset files benchmark_1.nt, benchmark_10.nt, benchmark_50.nt and benchmark_100.nt must be in the same directory. The automated evaluation script is executed with the command:
 
