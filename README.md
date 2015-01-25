@@ -81,7 +81,7 @@ where benchmark_x.nt is one input dataset, or by executing once the automated_ev
 If the query succeeds we see a list that contains the generated SPARQL 1.0 code, the shortest path, the path cost and the execution time.
 
 ###Shortest Path Calculation
-After the identification step, a restricted shortest path algorithm is used in order to find the shortest path between the two nodes. The restriction imposed on the algorithm is that either the first or the last edge of a candidate shortest path must be the same as the property contained in the Property Path of the example SPARQL query (eg. <http://dbpedia.org/property/stylisticOrigins>). The algorithm is based on Dijkstra's shortest path algorithm which has a worst case complexity of O(V^2), where V is the number of nodes in the graph.
+After the identification step, a restricted shortest path algorithm is used in order to find the shortest path between the two nodes. The algorithm is based on Dijkstra's shortest path algorithm which has a worst case complexity of O(V^2), where V is the number of nodes in the graph.
 
 ###Path to SPARQL 1.0 Conversion
 In the following subsections we present the calculated shortest path and the generated SPARQL code after querying the RDF-type summary of every dataset.
