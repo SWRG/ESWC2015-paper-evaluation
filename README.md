@@ -4,6 +4,7 @@ The time measurements were taken by running the scripts on a desktop computer ha
 * CPU: AMD Phenom II X4 965
 * RAM: 12GB DDR3
 * OS: Ubuntu Linux 14.04, kernel version: 3.13.0-44-generic
+* Packages: Python 2.7.9 (64bit), networkx v1.8, gnuplot v4.6
 
 ##Querying the RDF-type Summary Graph
 The execution of a query against an RDF-type summary graph consists of three steps:
@@ -25,14 +26,56 @@ The example query presented in the evaluation section of the paper is this:
 In the following paragraphs we give a more thorough analysis of the steps involved in the execution of this query to the RDF-type summary graphs.
 
 ###Node Identification
-The identification step involves retrieving a list of (possibly composite) nodes that contain the given RDF-type and selecting one from this list. Since there is no semantic difference among the nodes in the list, we can select anyone. However, we have to make sure this node exists in every RDF-type summary graph under consideration.
+The identification step involves retrieving a list of (possibly composite) nodes that contain the given RDF-type and selecting one from this list. In a real-life scenario, the user would have to be able to select the node that is semantically closer to his/hers information needs. However, since the proposed evaluation is
+just meant to assess the scalability of the proposed approach, any node may be selected, as long as it exists in all the datasets that participate in the evaluation scenario. Along these lines, we have selected the nodes described below, but the reader may select any of the given nodes and perform the rest of the evaluation process.
 
 The example SPARQL 1.1 query presented in the evaluation section of the paper contains two RDF types, one in the triple pattern preceding the Property Path (eg. <http://dbpedia.org/ontology/MusicalWork>) and one in the final triple pattern (eg. <http://dbpedia.org/ontology/MusicGenre>). During the identification step, we choose the following common nodes of the RDF-type summary graphs respectively:
 
 * 'http://dbpedia.org/ontology/Album^http://dbpedia.org/ontology/MusicalWork^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/ontology/Work'
 * 'http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing'
 
-Both of the nodes are composite nodes. The '^' character is used as an RDF type delimiter inside composite nodes. The first node corresponds to <http://dbpedia.org/ontology/MusicalWork>, since it contains the same IRI. The second node corresponds to <http://dbpedia.org/ontology/MusicGenre> for the same reason. Prior to selecting these nodes we made sure they exist in every RDF-type summary graph under consideration.
+Both of the nodes are composite nodes. The '^' character is used as an RDF type delimiter inside composite nodes. The first node corresponds to <http://dbpedia.org/ontology/MusicalWork>, since it contains the same IRI. The second node corresponds to <http://dbpedia.org/ontology/MusicGenre> for the same reason.
+
+
+**Selecting Other Nodes**
+
+In order to select other nodes than the ones presented above, the user must follow these instructions:
+
+1. Download and extract the [master](https://github.com/SWRG/ESWC2015-paper-evaluation/tarball/master) branch of this repository.
+1. Open a terminal and change directory to the one containing the downloaded python scripts.
+1. If the RDF-type summary graphs do not exist in the system, they must be created first. This can be accomplished either by executing the summary creation script directly:
+
+        create_summary.py benchmark_x.nt
+where benchmark_x.nt is one input dataset, or by executing once the automated_evaluation.py (see section 'Automated evaluation script' about usage and dataset retrieval). The first command creates the RDF-type summary graph that corresponds to the input N-Triples file.
+1. Open an interactive Python interface by giving the command:
+
+        python
+1. Create a general RDF-type summary graph querying object and set the predicate of the Property Path:
+
+        from RDFTypeSummary import*
+        mysum=RDFTypeSummary()
+        q_p='http://dbpedia.org/property/stylisticOrigins'
+1. Load an RDF-type summary graph by passing the filepath as a parameter:
+
+        mysum.loaddb('/path/to/summary.edgelist')
+
+1. Get a list of composite nodes that contain the RDF-type IRI <http://dbpedia.org/ontology/MusicalWork>
+
+        candidate_nodes_1=[n for n in mysum.db_graph if 'http://dbpedia.org/ontology/MusicalWork' in n]
+
+1. Read the list and select a node.  Let's assume you selected the third node in the list. Give the command:
+
+        q_s=candidate_nodes_1[2]
+1. Get a list of composite nodes that contain the RDF-type IRI <http://dbpedia.org/ontology/MusicGenre>
+
+        candidate_nodes_2=[n for n in mysum.db_graph if 'http://dbpedia.org/ontology/MusicGenre' in n]
+1. Read the list and select a node.  Let's assume you selected the fourth node in the list. Give the command:
+
+        q_t=candidate_nodes_2[3]
+1. At this point we have identified two nodes in the RDF-type summary graph and we are ready to measure the execution time of the query as follows:
+
+        mysum.execute_query(q_s,q_p,q_t)
+If the query succeeds we see list that contains the generated SPARQL 1.0 code, the shortest path, the path cost and the execution time.
 
 ###Shortest Path Calculation
 After the identification step, a restricted shortest path algorithm is used in order to find the shortest path between the two nodes. The restriction imposed on the algorithm is that either the first or the last edge of a candidate shortest path must be the same as the property contained in the Property Path of the example SPARQL query (eg. <http://dbpedia.org/property/stylisticOrigins>). The algorithm is based on Dijkstra's shortest path algorithm which has a worst case complexity of O(V^2), where V is the number of nodes in the graph.
