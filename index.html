@@ -43,7 +43,7 @@
 <li>CPU: AMD Phenom II X4 965</li>
 <li>RAM: 12GB DDR3</li>
 <li>OS: Ubuntu Linux 14.04, kernel version: 3.13.0-44-generic</li>
-<li>Packages: Python 2.7.9 (64bit), networkx v1.8, gnuplot v4.6</li>
+<li>Packages: Python 2.7.9 (64bit), networkx v1.8, librdf, gnuplot v4.6</li>
 </ul>
 
 <h2>
@@ -366,9 +366,9 @@ q_p='http://dbpedia.org/property/stylisticOrigins'
 <a id="automated-evaluation-script" class="anchor" href="#automated-evaluation-script" aria-hidden="true"><span class="octicon octicon-link"></span></a>Automated evaluation script</h2>
 
 <p>We have prepared a script that takes as input the 4 DBPEDIA datasets (namely benchmark_1.nt, benchmark_10.nt, benchmark_50.nt and benchmark_100.nt) and creates all RDF-type summary graphs, executes the example query against the graphs, measures execution time and creates the scalability plot. The script can be found at <a href="https://github.com/SWRG/ESWC2015-paper-evaluation/blob/master/automated_evaluation.py">automated_evaluation.py</a>.
-Before executing the script make sure networkx and gnuplot are installed in the system. To install these packages on an Ubuntu 14.04 platform, just give the following command:</p>
+Before executing the script make sure networkx, librdf and gnuplot are installed in the system. To install these packages on an Ubuntu 14.04 platform, just give the following command:</p>
 
-<pre><code>sudo apt-get install gnuplot, python-networkx
+<pre><code>sudo apt-get install gnuplot, python-networkx, python-librdf
 </code></pre>
 
 <p>The dataset files benchmark_1.nt, benchmark_10.nt, benchmark_50.nt and benchmark_100.nt must be in the same directory. The automated evaluation script is executed with the command:</p>
