@@ -109,7 +109,7 @@ just meant to assess the scalability of the proposed approach, any node may be s
 <li>
 <p>Create a general RDF-type summary graph querying object and set the predicate of the Property Path:</p>
 
-<pre><code>from RDFTypeSummary import*
+<pre><code>from RDFTypeSummary import *
 mysum=RDFTypeSummary()
 q_p='http://dbpedia.org/property/stylisticOrigins'
 </code></pre>
@@ -150,7 +150,7 @@ q_p='http://dbpedia.org/property/stylisticOrigins'
 <pre><code>mysum.execute_query(q_s,q_p,q_t)
 </code></pre>
 
-<p>If the query succeeds we see list that contains the generated SPARQL 1.0 code, the shortest path, the path cost and the execution time.</p>
+<p>If the query succeeds we see a list that contains the generated SPARQL 1.0 code, the shortest path, the path cost and the execution time.</p>
 </li>
 </ol>
 
