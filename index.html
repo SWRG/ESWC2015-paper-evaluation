@@ -4,11 +4,11 @@
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="ESWC2015-paper-evaluation : ">
+    <meta name="description" content="ESWC2015 PAPER EVALUATION : ">
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>ESWC2015-paper-evaluation</title>
+    <title>ESWC2015 PAPER EVALUATION</title>
   </head>
 
   <body>
@@ -18,7 +18,7 @@
         <header class="inner">
           <a id="forkme_banner" href="https://github.com/SWRG/ESWC2015-paper-evaluation">View on GitHub</a>
 
-          <h1 id="project_title">ESWC2015-paper-evaluation</h1>
+          <h1 id="project_title">ESWC2015 PAPER EVALUATION</h1>
           <h2 id="project_tagline"></h2>
 
             <section id="downloads">
@@ -34,8 +34,8 @@
         <h1>
 <a id="evaluation" class="anchor" href="#evaluation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Evaluation</h1>
 
-<h3>
-<a id="time-measurements" class="anchor" href="#time-measurements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Time measurements</h3>
+<h2>
+<a id="time-measurements" class="anchor" href="#time-measurements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Time Measurements</h2>
 
 <p>The time measurements were taken by running the scripts on a desktop computer having the following characteristics:</p>
 
@@ -45,14 +45,14 @@
 <li>OS: Ubuntu Linux 14.04, kernel version: 3.13.0-44-generic</li>
 </ul>
 
-<h3>
-<a id="querying-the-rdf-type-summary-graph" class="anchor" href="#querying-the-rdf-type-summary-graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>Querying the RDF-type summary graph</h3>
+<h2>
+<a id="querying-the-rdf-type-summary-graph" class="anchor" href="#querying-the-rdf-type-summary-graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>Querying the RDF-type Summary Graph</h2>
 
 <p>The execution of a query against an RDF-type summary graph consists of three steps:</p>
 
 <ol>
 <li>identification of the given typed nodes,</li>
-<li>calculation of the shortest path between these nodes and</li>
+<li>calculation of the shortest path between these nodes and </li>
 <li>conversion of the path to the corresponding SPARQL 1.0 query.</li>
 </ol>
 
@@ -70,7 +70,7 @@ SELECT * WHERE {
 <p>In the following paragraphs we give a more thorough analysis of the steps involved in the execution of this query to the RDF-type summary graphs.</p>
 
 <h3>
-<a id="node-identification" class="anchor" href="#node-identification" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node identification</h3>
+<a id="node-identification" class="anchor" href="#node-identification" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node Identification</h3>
 
 <p>The identification step involves retrieving a list of (possibly composite) nodes that contain the given RDF-type and selecting one from this list. Since there is no semantic difference among the nodes in the list, we can select anyone. However, we have to make sure this node exists in every RDF-type summary graph under consideration.</p>
 
@@ -81,30 +81,197 @@ SELECT * WHERE {
 <li>'<a href="http://dbpedia.org/class/yago/PunkGenres%5Ehttp://dbpedia.org/ontology/MusicGenre%5Ehttp://www.w3.org/2002/07/owl#Thing">http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing</a>'</li>
 </ul>
 
-<p>Both of the nodes are composite nodes. The '^' character is used as an RDF type delimiter inside composite nodes. The first node corresponds to <a href="http://dbpedia.org/ontology/MusicalWork">http://dbpedia.org/ontology/MusicalWork</a>, since it contains the same IRI. The second node corresponds to <a href="http://dbpedia.org/ontology/MusicGenre">http://dbpedia.org/ontology/MusicGenre</a> for the same reason. Prior to selecting these nodes we made sure they exist in every RDF-type summary graph under consideration.</p>
+<p>Both of the nodes are composite nodes. The '^' character is used as an RDF type delimiter inside composite nodes. The first node corresponds to <a href="http://dbpedia.org/ontology/MusicalWork">http://dbpedia.org/ontology/MusicalWork</a>, since it contains the same IRI. The second node corresponds to <a href="http://dbpedia.org/ontology/MusicGenre">http://dbpedia.org/ontology/MusicGenre</a> for the same reason. Prior to selecting these nodes we made sure they exist in every RDF-type summary graph under consideration. </p>
 
-<h3>
-<a id="shortest-path-calculation" class="anchor" href="#shortest-path-calculation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Shortest path calculation</h3>
+<h2>
+<a id="shortest-path-calculation" class="anchor" href="#shortest-path-calculation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Shortest Path Calculation</h2>
 
 <p>After the identification step, a restricted shortest path algorithm is used in order to find the shortest path between the two nodes. The restriction imposed on the algorithm is that either the first or the last edge of a candidate shortest path must be the same as the property contained in the Property Path of the example SPARQL query (eg. <a href="http://dbpedia.org/property/stylisticOrigins">http://dbpedia.org/property/stylisticOrigins</a>). The algorithm is based on Dijkstra's shortest path algorithm which has a worst case complexity of O(V^2), where V is the number of nodes in the graph.</p>
 
-<h3>
-<a id="path-to-sparql-10-conversion" class="anchor" href="#path-to-sparql-10-conversion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Path to SPARQL 1.0 conversion</h3>
+<h2>
+<a id="path-to-sparql-10-conversion" class="anchor" href="#path-to-sparql-10-conversion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Path to SPARQL 1.0 Conversion</h2>
+
+<p>In the following subsections we present the calculated shortest path and the generated SPARQL code after querying the RDF-type summary of every dataset.</p>
 
 <h3>
-<a id="explanation-of-the-time-decrease-in-the-plot" class="anchor" href="#explanation-of-the-time-decrease-in-the-plot" aria-hidden="true"><span class="octicon octicon-link"></span></a>Explanation of the time decrease in the plot</h3>
+<a id="rdf-type-summary-graph-of-the-1-dataset" class="anchor" href="#rdf-type-summary-graph-of-the-1-dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDF-Type Summary Graph of the 1% Dataset</h3>
 
-<p>The time measurement depends mainly on the running time of the shortest-path algorithm. Since the 50% dataset contains less triples than the 100% dataset, the corresponding RDF-type summary graphs may contain different shortest paths between the same endpoints. This means that the algorithm would have to examine more nodes (in the RDF-type summary graph of the 50% dataset) in order to find the shortest path. As a result, the query execution time could be greater in the 50% dataset than in the 100% dataset. Therefore, the execution time of the navigational query is independant of the RDF graph size. Instead, it depends on the size of the RDF-type summary which, in turn, is proportional to the number of predicates it contains.</p>
+<p>The shortest path found by the algorithm is:</p>
 
-<p>If there is no path between the endpoints, the Dijkstra algorithm is expected to take more time to finish due to visiting a greater number of nodes before.</p>
+<pre><code>['http://dbpedia.org/ontology/Album^http://dbpedia.org/ontology/MusicalWork^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/ontology/Work',('http://dbpedia.org/ontology/Album^http://dbpedia.org/ontology/MusicalWork^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/ontology/Work','http://dbpedia.org/ontology/genre','http://dbpedia.org/ontology/MusicGenre^http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/class/yago/FusionMusicGenres^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/class/yago/PopMusicGenres'),'http://dbpedia.org/ontology/MusicGenre^http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/class/yago/FusionMusicGenres^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/class/yago/PopMusicGenres',('http://dbpedia.org/ontology/MusicGenre^http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/class/yago/FusionMusicGenres^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/class/yago/PopMusicGenres','http://dbpedia.org/property/otherTopics','http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing'),'http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing',('http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing','http://dbpedia.org/property/stylisticOrigins','http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing'),'http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing']
+</code></pre>
+
+<p>The path is converted to this SPARQL 1.0 code:</p>
+
+<pre><code>SELECT DISTINCT * WHERE {
+?_4 a &lt;http://dbpedia.org/class/yago/PunkGenres&gt; .
+?_4 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_4 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/Album&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/MusicalWork&gt; .
+?_1 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/Work&gt; .
+?_3 a &lt;http://dbpedia.org/class/yago/PunkGenres&gt; .
+?_3 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_3 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_2 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/PunkGenres&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/FusionMusicGenres&gt; .
+?_2 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/PopMusicGenres&gt; .
+?_3 &lt;http://dbpedia.org/property/stylisticOrigins&gt; ?_4 .
+?_1 &lt;http://dbpedia.org/ontology/genre&gt; ?_2 .
+?_2 &lt;http://dbpedia.org/property/otherTopics&gt; ?_3 .
+}
+</code></pre>
+
+<h3>
+<a id="rdf-type-summary-graph-of-the-10-dataset" class="anchor" href="#rdf-type-summary-graph-of-the-10-dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDF-Type Summary Graph of the 10% Dataset</h3>
+
+<p>The shortest path found by the algorithm is:</p>
+
+<pre><code>['http://dbpedia.org/ontology/Album\nhttp://dbpedia.org/ontology/MusicalWork\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Work',('http://dbpedia.org/ontology/Album\nhttp://dbpedia.org/ontology/MusicalWork\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Work','http://dbpedia.org/ontology/artist','http://dbpedia.org/class/yago/JapaneseIndieRockGroups\nhttp://dbpedia.org/ontology/Band\nhttp://dbpedia.org/ontology/Organisation\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/class/yago/JapaneseRockMusicGroups'),'http://dbpedia.org/class/yago/JapaneseIndieRockGroups\nhttp://dbpedia.org/ontology/Band\nhttp://dbpedia.org/ontology/Organisation\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/class/yago/JapaneseRockMusicGroups',('http://dbpedia.org/class/yago/JapaneseIndieRockGroups\nhttp://dbpedia.org/ontology/Band\nhttp://dbpedia.org/ontology/Organisation\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/class/yago/JapaneseRockMusicGroups','http://dbpedia.org/ontology/genre','http://dbpedia.org/ontology/MusicGenre\nhttp://www.w3.org/2002/07/owl#Thing'),'http://dbpedia.org/ontology/MusicGenre\nhttp://www.w3.org/2002/07/owl#Thing',('http://dbpedia.org/ontology/MusicGenre\nhttp://www.w3.org/2002/07/owl#Thing','http://dbpedia.org/ontology/stylisticOrigin','http://dbpedia.org/ontology/MusicGenre\nhttp://dbpedia.org/class/yago/FusionMusicGenres\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/class/yago/HardcorePunkGenres'),'http://dbpedia.org/ontology/MusicGenre\nhttp://dbpedia.org/class/yago/FusionMusicGenres\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/class/yago/HardcorePunkGenres',('http://dbpedia.org/ontology/MusicGenre\nhttp://dbpedia.org/class/yago/FusionMusicGenres\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/class/yago/HardcorePunkGenres','http://dbpedia.org/property/stylisticOrigins','http://dbpedia.org/class/yago/PunkGenres\nhttp://dbpedia.org/ontology/MusicGenre\nhttp://www.w3.org/2002/07/owl#Thing'),'http://dbpedia.org/class/yago/PunkGenres\nhttp://dbpedia.org/ontology/MusicGenre\nhttp://www.w3.org/2002/07/owl#Thing']
+</code></pre>
+
+<p>The path is converted to this SPARQL 1.0 code:</p>
+
+<pre><code>SELECT DISTINCT * WHERE {
+?_5 a &lt;http://dbpedia.org/class/yago/PunkGenres&gt; .
+?_5 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_5 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_4 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_4 a &lt;http://dbpedia.org/class/yago/FusionMusicGenres&gt; .
+?_4 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_4 a &lt;http://dbpedia.org/class/yago/HardcorePunkGenres&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/Album&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/MusicalWork&gt; .
+?_1 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/Work&gt; .
+?_3 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_3 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/JapaneseIndieRockGroups&gt; .
+?_2 a &lt;http://dbpedia.org/ontology/Band&gt; .
+?_2 a &lt;http://dbpedia.org/ontology/Organisation&gt; .
+?_2 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/JapaneseRockMusicGroups&gt; .
+?_3 &lt;http://dbpedia.org/ontology/stylisticOrigin&gt; ?_4 .
+?_4 &lt;http://dbpedia.org/property/stylisticOrigins&gt; ?_5 .
+?_1 &lt;http://dbpedia.org/ontology/artist&gt; ?_2 .
+?_2 &lt;http://dbpedia.org/ontology/genre&gt; ?_3 .
+}
+</code></pre>
+
+<h3>
+<a id="rdf-type-summary-graph-of-the-50-dataset" class="anchor" href="#rdf-type-summary-graph-of-the-50-dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDF-Type Summary Graph of the 50% Dataset</h3>
+
+<p>The shortest path found by the algorithm is:</p>
+
+<pre><code>['http://dbpedia.org/ontology/Album\nhttp://dbpedia.org/ontology/MusicalWork\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Work',('http://dbpedia.org/ontology/Album\nhttp://dbpedia.org/ontology/MusicalWork\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Work','http://dbpedia.org/property/artist','http://dbpedia.org/ontology/Band\nhttp://dbpedia.org/class/yago/MusicalGroupsEstablishedIn2002\nhttp://dbpedia.org/class/yago/2000sMusicGroups\nhttp://dbpedia.org/ontology/Organisation\nhttp://dbpedia.org/class/yago/BostonMusicalGroups\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/class/yago/AmericanPunkRockGroups'),'http://dbpedia.org/ontology/Band\nhttp://dbpedia.org/class/yago/MusicalGroupsEstablishedIn2002\nhttp://dbpedia.org/class/yago/2000sMusicGroups\nhttp://dbpedia.org/ontology/Organisation\nhttp://dbpedia.org/class/yago/BostonMusicalGroups\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/class/yago/AmericanPunkRockGroups',('http://dbpedia.org/ontology/Band\nhttp://dbpedia.org/class/yago/MusicalGroupsEstablishedIn2002\nhttp://dbpedia.org/class/yago/2000sMusicGroups\nhttp://dbpedia.org/ontology/Organisation\nhttp://dbpedia.org/class/yago/BostonMusicalGroups\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/class/yago/AmericanPunkRockGroups','http://dbpedia.org/property/origin','http://dbpedia.org/ontology/PopulatedPlace\nhttp://dbpedia.org/class/yago/Country108544813\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Place\nhttp://dbpedia.org/class/yago/StatesOfTheUnitedStates\nhttp://dbpedia.org/ontology/AdministrativeRegion'),'http://dbpedia.org/ontology/PopulatedPlace\nhttp://dbpedia.org/class/yago/Country108544813\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Place\nhttp://dbpedia.org/class/yago/StatesOfTheUnitedStates\nhttp://dbpedia.org/ontology/AdministrativeRegion',('http://dbpedia.org/ontology/PopulatedPlace\nhttp://dbpedia.org/class/yago/Country108544813\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Place\nhttp://dbpedia.org/class/yago/StatesOfTheUnitedStates\nhttp://dbpedia.org/ontology/AdministrativeRegion','http://dbpedia.org/property/flower','http://dbpedia.org/ontology/Plant\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Eukaryote\nhttp://dbpedia.org/ontology/Species'),'http://dbpedia.org/ontology/Plant\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Eukaryote\nhttp://dbpedia.org/ontology/Species',('http://dbpedia.org/ontology/Plant\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/Eukaryote\nhttp://dbpedia.org/ontology/Species','http://dbpedia.org/ontology/binomialAuthority','http://dbpedia.org/ontology/Person\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/MusicalArtist\nhttp://dbpedia.org/ontology/Artist'),'http://dbpedia.org/ontology/Person\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/MusicalArtist\nhttp://dbpedia.org/ontology/Artist',('http://dbpedia.org/ontology/Person\nhttp://www.w3.org/2002/07/owl#Thing\nhttp://dbpedia.org/ontology/MusicalArtist\nhttp://dbpedia.org/ontology/Artist','http://dbpedia.org/property/genre','http://dbpedia.org/ontology/MusicGenre\nhttp://dbpedia.org/class/yago/MetalSubgenres\nhttp://dbpedia.org/class/yago/FusionMusicGenres\nhttp://www.w3.org/2002/07/owl#Thing'),'http://dbpedia.org/ontology/MusicGenre\nhttp://dbpedia.org/class/yago/MetalSubgenres\nhttp://dbpedia.org/class/yago/FusionMusicGenres\nhttp://www.w3.org/2002/07/owl#Thing',('http://dbpedia.org/ontology/MusicGenre\nhttp://dbpedia.org/class/yago/MetalSubgenres\nhttp://dbpedia.org/class/yago/FusionMusicGenres\nhttp://www.w3.org/2002/07/owl#Thing','http://dbpedia.org/property/stylisticOrigins','http://dbpedia.org/class/yago/PunkGenres\nhttp://dbpedia.org/ontology/MusicGenre\nhttp://www.w3.org/2002/07/owl#Thing'),'http://dbpedia.org/class/yago/PunkGenres\nhttp://dbpedia.org/ontology/MusicGenre\nhttp://www.w3.org/2002/07/owl#Thing']
+</code></pre>
+
+<p>The path is converted to this SPARQL 1.0 code:</p>
+
+<pre><code>SELECT DISTINCT * WHERE {
+?_5 a &lt;http://dbpedia.org/ontology/Person&gt; .
+?_5 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_5 a &lt;http://dbpedia.org/ontology/MusicalArtist&gt; .
+?_5 a &lt;http://dbpedia.org/ontology/Artist&gt; .
+?_4 a &lt;http://dbpedia.org/ontology/Plant&gt; .
+?_4 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_4 a &lt;http://dbpedia.org/ontology/Eukaryote&gt; .
+?_4 a &lt;http://dbpedia.org/ontology/Species&gt; .
+?_7 a &lt;http://dbpedia.org/class/yago/PunkGenres&gt; .
+?_7 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_7 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_6 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_6 a &lt;http://dbpedia.org/class/yago/MetalSubgenres&gt; .
+?_6 a &lt;http://dbpedia.org/class/yago/FusionMusicGenres&gt; .
+?_6 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/Album&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/MusicalWork&gt; .
+?_1 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/Work&gt; .
+?_3 a &lt;http://dbpedia.org/ontology/PopulatedPlace&gt; .
+?_3 a &lt;http://dbpedia.org/class/yago/Country108544813&gt; .
+?_3 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_3 a &lt;http://dbpedia.org/ontology/Place&gt; .
+?_3 a &lt;http://dbpedia.org/class/yago/StatesOfTheUnitedStates&gt; .
+?_3 a &lt;http://dbpedia.org/ontology/AdministrativeRegion&gt; .
+?_2 a &lt;http://dbpedia.org/ontology/Band&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/MusicalGroupsEstablishedIn2002&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/2000sMusicGroups&gt; .
+?_2 a &lt;http://dbpedia.org/ontology/Organisation&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/BostonMusicalGroups&gt; .
+?_2 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/AmericanPunkRockGroups&gt; .
+?_1 &lt;http://dbpedia.org/property/artist&gt; ?_2 .
+?_3 &lt;http://dbpedia.org/property/flower&gt; ?_4 .
+?_6 &lt;http://dbpedia.org/property/stylisticOrigins&gt; ?_7 .
+?_2 &lt;http://dbpedia.org/property/origin&gt; ?_3 .
+?_4 &lt;http://dbpedia.org/ontology/binomialAuthority&gt; ?_5 .
+?_5 &lt;http://dbpedia.org/property/genre&gt; ?_6 .
+}
+</code></pre>
+
+<h3>
+<a id="rdf-type-summary-graph-of-the-100-dataset" class="anchor" href="#rdf-type-summary-graph-of-the-100-dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDF-Type Summary Graph of the 100% Dataset</h3>
+
+<p>The shortest path found by the algorithm is:</p>
+
+<pre><code>['http://dbpedia.org/ontology/Album^http://dbpedia.org/ontology/MusicalWork^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/ontology/Work',('http://dbpedia.org/ontology/Album^http://dbpedia.org/ontology/MusicalWork^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/ontology/Work','http://dbpedia.org/property/artist','http://dbpedia.org/class/yago/MurderedHipHopMusicians^http://dbpedia.org/class/yago/SouthernHipHopMusicians^http://dbpedia.org/class/yago/MurderedEntertainers^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/class/yago/Rapper110507482^http://dbpedia.org/class/yago/MusiciansOfNewOrleans^http://dbpedia.org/ontology/Artist^http://dbpedia.org/class/yago/Artist109812338^http://dbpedia.org/ontology/MusicalArtist^http://dbpedia.org/ontology/Person^http://dbpedia.org/class/yago/SouthernRappers^http://dbpedia.org/class/yago/AmericanMurderVictims^http://dbpedia.org/class/yago/AfricanAmericanRappers'),'http://dbpedia.org/class/yago/MurderedHipHopMusicians^http://dbpedia.org/class/yago/SouthernHipHopMusicians^http://dbpedia.org/class/yago/MurderedEntertainers^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/class/yago/Rapper110507482^http://dbpedia.org/class/yago/MusiciansOfNewOrleans^http://dbpedia.org/ontology/Artist^http://dbpedia.org/class/yago/Artist109812338^http://dbpedia.org/ontology/MusicalArtist^http://dbpedia.org/ontology/Person^http://dbpedia.org/class/yago/SouthernRappers^http://dbpedia.org/class/yago/AmericanMurderVictims^http://dbpedia.org/class/yago/AfricanAmericanRappers',('http://dbpedia.org/class/yago/MurderedHipHopMusicians^http://dbpedia.org/class/yago/SouthernHipHopMusicians^http://dbpedia.org/class/yago/MurderedEntertainers^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/class/yago/Rapper110507482^http://dbpedia.org/class/yago/MusiciansOfNewOrleans^http://dbpedia.org/ontology/Artist^http://dbpedia.org/class/yago/Artist109812338^http://dbpedia.org/ontology/MusicalArtist^http://dbpedia.org/ontology/Person^http://dbpedia.org/class/yago/SouthernRappers^http://dbpedia.org/class/yago/AmericanMurderVictims^http://dbpedia.org/class/yago/AfricanAmericanRappers','http://dbpedia.org/property/associatedActs','http://dbpedia.org/ontology/Person^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/ontology/MusicalArtist^http://dbpedia.org/ontology/Artist'),'http://dbpedia.org/ontology/Person^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/ontology/MusicalArtist^http://dbpedia.org/ontology/Artist',('http://dbpedia.org/ontology/Person^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/ontology/MusicalArtist^http://dbpedia.org/ontology/Artist','http://dbpedia.org/property/genre','http://dbpedia.org/ontology/MusicGenre^http://dbpedia.org/class/yago/MusicGenres^http://www.w3.org/2002/07/owl#Thing'),'http://dbpedia.org/ontology/MusicGenre^http://dbpedia.org/class/yago/MusicGenres^http://www.w3.org/2002/07/owl#Thing',('http://dbpedia.org/ontology/MusicGenre^http://dbpedia.org/class/yago/MusicGenres^http://www.w3.org/2002/07/owl#Thing','http://dbpedia.org/property/stylisticOrigins','http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing'),'http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing']
+</code></pre>
+
+<p>The path is converted to this SPARQL 1.0 code:</p>
+
+<pre><code>SELECT DISTINCT * WHERE {
+?_5 a &lt;http://dbpedia.org/class/yago/PunkGenres&gt; .
+?_5 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_5 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_4 a &lt;http://dbpedia.org/ontology/MusicGenre&gt; .
+?_4 a &lt;http://dbpedia.org/class/yago/MusicGenres&gt; .
+?_4 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/Album&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/MusicalWork&gt; .
+?_1 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_1 a &lt;http://dbpedia.org/ontology/Work&gt; .
+?_3 a &lt;http://dbpedia.org/ontology/Person&gt; .
+?_3 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_3 a &lt;http://dbpedia.org/ontology/MusicalArtist&gt; .
+?_3 a &lt;http://dbpedia.org/ontology/Artist&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/MurderedHipHopMusicians&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/SouthernHipHopMusicians&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/AmericanMurderVictims&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/MurderedEntertainers&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/Rapper110507482&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/MusiciansOfNewOrleans&gt; .
+?_2 a &lt;http://dbpedia.org/ontology/Artist&gt; .
+?_2 a &lt;http://www.w3.org/2002/07/owl#Thing&gt; .
+?_2 a &lt;http://dbpedia.org/ontology/MusicalArtist&gt; .
+?_2 a &lt;http://dbpedia.org/ontology/Person&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/SouthernRappers&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/Artist109812338&gt; .
+?_2 a &lt;http://dbpedia.org/class/yago/AfricanAmericanRappers&gt; .
+?_3 &lt;http://dbpedia.org/property/genre&gt; ?_4 .
+?_4 &lt;http://dbpedia.org/property/stylisticOrigins&gt; ?_5 .
+?_1 &lt;http://dbpedia.org/property/artist&gt; ?_2 .
+?_2 &lt;http://dbpedia.org/property/associatedActs&gt; ?_3 .
+}
+</code></pre>
 
 <h2>
-<a id="repository-contents" class="anchor" href="#repository-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repository Contents</h2>
+<a id="query-execution-time-decrease" class="anchor" href="#query-execution-time-decrease" aria-hidden="true"><span class="octicon octicon-link"></span></a>Query Execution Time Decrease</h2>
+
+<p>Here we give an explanation of the query execution time decrease at the final point in the plot. The time measurement depends mainly on the running time of the shortest-path algorithm. Since the 50% dataset contains less triples than the 100% dataset, the corresponding RDF-type summary graphs may contain different shortest paths between the same endpoints. This means that the algorithm would have to examine more nodes (in the RDF-type summary graph of the 50% dataset) in order to find the shortest path. As a result, the query execution time could be greater in the 50% dataset than in the 100% dataset. Therefore, the execution time of the navigational query is independant of the RDF graph size. Instead, it depends on the size of the RDF-type summary which, in turn, is proportional to the number of predicates it contains.</p>
+
+<p>If there is no path between the endpoints, the Dijkstra algorithm is expected to take more time to finish due to visiting a greater number of nodes.</p>
+
+<h1>
+<a id="repository-contents" class="anchor" href="#repository-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repository Contents</h1>
 
 <p>In this repository you can find links to the DBPEDIA datasets that were used for the evaluation of the paper.</p>
 
-<h3>
-<a id="dataset-links" class="anchor" href="#dataset-links" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dataset links</h3>
+<h2>
+<a id="dataset-links" class="anchor" href="#dataset-links" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dataset links</h2>
 
 <p>The datasets used for the evaluation can be downloaded from the links below:</p>
 
@@ -122,8 +289,8 @@ SELECT * WHERE {
 <pre><code>head -1537384 benchmark_10.nt &gt; benchmark_1.nt
 </code></pre>
 
-<h3>
-<a id="automated-evaluation-script" class="anchor" href="#automated-evaluation-script" aria-hidden="true"><span class="octicon octicon-link"></span></a>Automated evaluation script</h3>
+<h2>
+<a id="automated-evaluation-script" class="anchor" href="#automated-evaluation-script" aria-hidden="true"><span class="octicon octicon-link"></span></a>Automated evaluation script</h2>
 
 <p>We have prepared a script that takes as input the 4 DBPEDIA datasets (namely benchmark_1.nt, benchmark_10.nt, benchmark_50.nt and benchmark_100.nt) and creates all RDF-type summary graphs, executes the example query against the graphs, measures execution time and creates the scalability plot. The script can be found at <a href="https://github.com/SWRG/ESWC2015-paper-evaluation/blob/master/automated_evaluation.py">automated_evaluation.py</a>.
 Before executing the script make sure networkx and gnuplot are installed in the system. To install these packages on an Ubuntu 14.04 platform, just give the following command:</p>
@@ -137,13 +304,22 @@ Before executing the script make sure networkx and gnuplot are installed in the 
 </code></pre>
 
 <p>where DATASET_DIR is the directory that contains the datasets. The script stores the RDF-type summary graphs in the same directory. In addition, it creates a directory named 'evaluationdata' where it stores the scalability plot along with the corresponding data.</p>
+
+<p>The most time consuming step of the evaluation is the RDF-type summary creation. In our setup, the creation time of each dataset was:</p>
+
+<ol>
+<li>for the 1% dataset: 4min</li>
+<li>for the 10% dataset: 17min</li>
+<li>for the 50% dataset: 90min</li>
+<li>for the 100% dataset: 210min</li>
+</ol>
       </section>
     </div>
 
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">ESWC2015-paper-evaluation maintained by <a href="https://github.com/SWRG">SWRG</a></p>
+        <p class="copyright">ESWC2015 PAPER EVALUATION maintained by <a href="https://github.com/SWRG">SWRG</a></p>
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
