@@ -47,7 +47,7 @@ substitutions_dict = dict()
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-                                     epilog='Example: dataloader.py ./input.nt')    
+                                     epilog='Example: create_summary.py ./input.nt')    
 
     parser.add_argument('inputfile',
                         type=str,
