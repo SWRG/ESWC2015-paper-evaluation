@@ -43,6 +43,7 @@
 <li>CPU: AMD Phenom II X4 965</li>
 <li>RAM: 12GB DDR3</li>
 <li>OS: Ubuntu Linux 14.04, kernel version: 3.13.0-44-generic</li>
+<li>Packages: Python 2.7.9 (64bit), networkx v1.8, gnuplot v4.6</li>
 </ul>
 
 <h2>
@@ -72,7 +73,8 @@ SELECT * WHERE {
 <h3>
 <a id="node-identification" class="anchor" href="#node-identification" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node Identification</h3>
 
-<p>The identification step involves retrieving a list of (possibly composite) nodes that contain the given RDF-type and selecting one from this list. Since there is no semantic difference among the nodes in the list, we can select anyone. However, we have to make sure this node exists in every RDF-type summary graph under consideration.</p>
+<p>The identification step involves retrieving a list of (possibly composite) nodes that contain the given RDF-type and selecting one from this list. In a real-life scenario, the user would have to be able to select the node that is semantically closer to his/hers information needs. However, since the proposed evaluation is
+just meant to assess the scalability of the proposed approach, any node may be selected, as long as it exists in all the datasets that participate in the evaluation scenario. Along these lines, we have selected the nodes described below, but the reader may select any of the given nodes and perform the rest of the evaluation process.</p>
 
 <p>The example SPARQL 1.1 query presented in the evaluation section of the paper contains two RDF types, one in the triple pattern preceding the Property Path (eg. <a href="http://dbpedia.org/ontology/MusicalWork">http://dbpedia.org/ontology/MusicalWork</a>) and one in the final triple pattern (eg. <a href="http://dbpedia.org/ontology/MusicGenre">http://dbpedia.org/ontology/MusicGenre</a>). During the identification step, we choose the following common nodes of the RDF-type summary graphs respectively:</p>
 
@@ -81,7 +83,76 @@ SELECT * WHERE {
 <li>'<a href="http://dbpedia.org/class/yago/PunkGenres%5Ehttp://dbpedia.org/ontology/MusicGenre%5Ehttp://www.w3.org/2002/07/owl#Thing">http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing</a>'</li>
 </ul>
 
-<p>Both of the nodes are composite nodes. The '^' character is used as an RDF type delimiter inside composite nodes. The first node corresponds to <a href="http://dbpedia.org/ontology/MusicalWork">http://dbpedia.org/ontology/MusicalWork</a>, since it contains the same IRI. The second node corresponds to <a href="http://dbpedia.org/ontology/MusicGenre">http://dbpedia.org/ontology/MusicGenre</a> for the same reason. Prior to selecting these nodes we made sure they exist in every RDF-type summary graph under consideration. </p>
+<p>Both of the nodes are composite nodes. The '^' character is used as an RDF type delimiter inside composite nodes. The first node corresponds to <a href="http://dbpedia.org/ontology/MusicalWork">http://dbpedia.org/ontology/MusicalWork</a>, since it contains the same IRI. The second node corresponds to <a href="http://dbpedia.org/ontology/MusicGenre">http://dbpedia.org/ontology/MusicGenre</a> for the same reason.</p>
+
+<p><strong>Selecting Other Nodes</strong></p>
+
+<p>In order to select other nodes than the ones presented above, the user must follow these instructions:</p>
+
+<ol>
+<li>Download and extract the <a href="https://github.com/SWRG/ESWC2015-paper-evaluation/tarball/master">master</a> branch of this repository.</li>
+<li>Open a terminal and change directory to the one containing the downloaded python scripts.</li>
+<li>
+<p>If the RDF-type summary graphs do not exist in the system, they must be created first. This can be accomplished either by executing the summary creation script directly:</p>
+
+<pre><code>create_summary.py benchmark_x.nt
+</code></pre>
+
+<p>where benchmark_x.nt is one input dataset, or by executing once the automated_evaluation.py (see section 'Automated evaluation script' about usage and dataset retrieval). The first command creates the RDF-type summary graph that corresponds to the input N-Triples file.</p>
+</li>
+<li>
+<p>Open an interactive Python interface by giving the command:</p>
+
+<pre><code>python
+</code></pre>
+</li>
+<li>
+<p>Create a general RDF-type summary graph querying object and set the predicate of the Property Path:</p>
+
+<pre><code>from RDFTypeSummary import*
+mysum=RDFTypeSummary()
+q_p='http://dbpedia.org/property/stylisticOrigins'
+</code></pre>
+</li>
+<li>
+<p>Load an RDF-type summary graph by passing the filepath as a parameter:</p>
+
+<pre><code>mysum.loaddb('/path/to/summary.edgelist')
+</code></pre>
+</li>
+<li>
+<p>Get a list of composite nodes that contain the RDF-type IRI <a href="http://dbpedia.org/ontology/MusicalWork">http://dbpedia.org/ontology/MusicalWork</a></p>
+
+<pre><code>candidate_nodes_1=[n for n in mysum.db_graph if 'http://dbpedia.org/ontology/MusicalWork' in n]
+</code></pre>
+</li>
+<li>
+<p>Read the list and select a node.  Let's assume you selected the third node in the list. Give the command:</p>
+
+<pre><code>q_s=candidate_nodes_1[2]
+</code></pre>
+</li>
+<li>
+<p>Get a list of composite nodes that contain the RDF-type IRI <a href="http://dbpedia.org/ontology/MusicGenre">http://dbpedia.org/ontology/MusicGenre</a></p>
+
+<pre><code>candidate_nodes_2=[n for n in mysum.db_graph if 'http://dbpedia.org/ontology/MusicGenre' in n]
+</code></pre>
+</li>
+<li>
+<p>Read the list and select a node.  Let's assume you selected the fourth node in the list. Give the command:</p>
+
+<pre><code>q_t=candidate_nodes_2[3]
+</code></pre>
+</li>
+<li>
+<p>At this point we have identified two nodes in the RDF-type summary graph and we are ready to measure the execution time of the query as follows:</p>
+
+<pre><code>mysum.execute_query(q_s,q_p,q_t)
+</code></pre>
+
+<p>If the query succeeds we see list that contains the generated SPARQL 1.0 code, the shortest path, the path cost and the execution time.</p>
+</li>
+</ol>
 
 <h3>
 <a id="shortest-path-calculation" class="anchor" href="#shortest-path-calculation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Shortest Path Calculation</h3>
