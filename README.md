@@ -52,7 +52,7 @@ where benchmark_x.nt is one input dataset, or by executing once the automated_ev
         python
 1. Create a general RDF-type summary graph querying object and set the predicate of the Property Path:
 
-        from RDFTypeSummary import*
+        from RDFTypeSummary import *
         mysum=RDFTypeSummary()
         q_p='http://dbpedia.org/property/stylisticOrigins'
 1. Load an RDF-type summary graph by passing the filepath as a parameter:
@@ -75,7 +75,7 @@ where benchmark_x.nt is one input dataset, or by executing once the automated_ev
 1. At this point we have identified two nodes in the RDF-type summary graph and we are ready to measure the execution time of the query as follows:
 
         mysum.execute_query(q_s,q_p,q_t)
-If the query succeeds we see list that contains the generated SPARQL 1.0 code, the shortest path, the path cost and the execution time.
+If the query succeeds we see a list that contains the generated SPARQL 1.0 code, the shortest path, the path cost and the execution time.
 
 ###Shortest Path Calculation
 After the identification step, a restricted shortest path algorithm is used in order to find the shortest path between the two nodes. The restriction imposed on the algorithm is that either the first or the last edge of a candidate shortest path must be the same as the property contained in the Property Path of the example SPARQL query (eg. <http://dbpedia.org/property/stylisticOrigins>). The algorithm is based on Dijkstra's shortest path algorithm which has a worst case complexity of O(V^2), where V is the number of nodes in the graph.
