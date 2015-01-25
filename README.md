@@ -47,9 +47,12 @@ In order to select other nodes than the ones presented above, the user must foll
 
         create_summary.py benchmark_x.nt
 where benchmark_x.nt is one input dataset, or by executing once the automated_evaluation.py (see section 'Automated evaluation script' about usage and dataset retrieval). The first command creates the RDF-type summary graph that corresponds to the input N-Triples file.
+1. Install the ipython package:
+
+        sudo apt-get install ipython
 1. Open an interactive Python interface by giving the command:
 
-        python
+        ipython
 1. Create a general RDF-type summary graph querying object and set the predicate of the Property Path:
 
         from RDFTypeSummary import *
