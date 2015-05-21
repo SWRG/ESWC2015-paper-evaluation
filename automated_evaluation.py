@@ -71,14 +71,17 @@ if __name__ == '__main__':
     # Query RDF-type summary.
     print "Stage 2: Executing query against created RDF-type summary graphs."
 
-    # First node
-    q_s='http://dbpedia.org/ontology/Album^http://dbpedia.org/ontology/MusicalWork^http://www.w3.org/2002/07/owl#Thing^http://dbpedia.org/ontology/Work'
+    # source types
+    q_s=frozenset(['S-TYPE'])
 
-    # Property
-    q_p='http://dbpedia.org/property/stylisticOrigins'
+    # the property in the property path
+    q_p='property'
 
-    # Second node
-    q_t='http://dbpedia.org/class/yago/PunkGenres^http://dbpedia.org/ontology/MusicGenre^http://www.w3.org/2002/07/owl#Thing'
+    # target types
+    q_t=frozenset(['T-TYPE'])
+
+    # the limit number
+    q_l=10
 
     # Check graph existence
     files_elist=[os.path.join(input_dir,f) for f in files(input_dir) if os.path.splitext(f)[1] =='.edgelist']
@@ -94,9 +97,9 @@ if __name__ == '__main__':
     for f,dataset_percentage in zip(files_elist,dataset_percentage_elist):
         print "  Querying RDF-type summary graph: ",f
         mysum.loaddb(f)
-        result=mysum.execute_query(q_s,q_p,q_t)
+        result=mysum.execute_query(q_s,q_p,q_t,q_l)
         for i in range(9):
-            temp_result=mysum.execute_query(q_s,q_p,q_t)
+            temp_result=mysum.execute_query(q_s,q_p,q_t,q_l)
             if temp_result[3] < result[3]:
                 result = temp_result
 

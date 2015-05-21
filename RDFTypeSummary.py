@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 """
 This class can be used to load an RDF-type summary graph and execute queries
-against it. The graph may be stored either in Pickle format or as an edge list.
+against it. The graph is stored as an edge list file.
 
 :author: Spyridon Kazanas
 :contact: s.kazanas@gmail.com
 """
-import datetime
+import datetime,requests,json,csv
 import networkx as nx
-from corefunctions import get_sparql_from_graph
+from corefunctions import *
 from dijkstra import *
 from parser import *
-from cPickle import load, dump
+import cPickle
 from os import path
+from networkx.classes.multidigraph import MultiDiGraph
+import itertools
 
 class RDFTypeSummary():
     # db info
@@ -21,10 +23,8 @@ class RDFTypeSummary():
     db_nodes = None
     db_edges = None
     db_weight = None
-    tdelimiter = None
 
-    def __init__(self,inputfile=None,tdelimiter='^'):
-        self.tdelimiter=tdelimiter
+    def __init__(self,inputfile=None):
         if inputfile is not None:
             self.loaddb(inputfile)
 
@@ -42,7 +42,10 @@ class RDFTypeSummary():
 
         if path.isfile(inputfile):
             self.unloaddb()
-            self.db_graph = read_edgelist_2(inputfile,comments=" //#",nodetype=str,create_using=nx.MultiDiGraph())
+            self.db_graph=MultiDiGraph()
+            with open(inputfile,"rb") as f:
+                csvreader=csv.reader(f,delimiter=' ')
+                self.db_graph.add_edges_from((cPickle.loads(row[0]) for row in csvreader))
         else:
             print "File not found."
             return
@@ -69,7 +72,7 @@ class RDFTypeSummary():
         print "    Total weight: ",self.db_weight
         return
 
-    def execute_query(self,q_source,q_predicate,q_target):
+    def execute_query2(self,q_source,q_predicate,q_target,q_limit,endpoint='http://localhost:8890/sparql'):
         '''Queries db and returns results.
         '''
         search_time = datetime.datetime.now()
@@ -77,68 +80,231 @@ class RDFTypeSummary():
         print "Executing query:"
         print q_source,q_predicate,q_target
 
-        # find q_predicate that touches q_source
-        ets=[(e[0],e[2]['label'],e[1]) for e in self.db_graph.out_edges_iter([q_source],data=True, keys=False)]
+        types_query=""
+        for i in q_source:
+            types_query+="?_a a <"+i+">."
+        for i in q_target:
+            types_query+="?_b a <"+i+">."
 
-        # find inner node for each edge
-        nts=[v[2] for v in ets]
-        nts_p=[v[1] for v in ets]
+        info_list=[]
+        remainingresults = q_limit
+        results_sorted=[]
+        resutset=set()
+        ask_time_total=0.0 # measures total ask time
+        select_time_total=0.0 # measures total ask time
+        cur_path_length=0
+        while remainingresults > 0:
+            counter = itertools.count()
 
-        # find q_predicate that touches q_target
-        ett=[(e[0],e[2]['label'],e[1]) for e in self.db_graph.in_edges_iter([q_target],data=True, keys=False)]
+            print "Path Length=",cur_path_length
 
-        # find inner node for each edge
-        ntt=[v[0] for v in ett]
-        ntt_p=[v[1] for v in ett]
+            query="{"
+            query+=types_query
 
-        minshpath=None
-        # Choose the shortest of the paths that connect each node of nts to each node of ntt
-        for na,na_p in zip(nts,nts_p):
-            FINISH_FLAG = False
-            minshpath=None
-            minshpath_l=None
-            for nb,nb_p in zip(ntt,ntt_p):
-                # predicate must be in at least 1 endpoint
-                if na_p != q_predicate and nb_p != q_predicate: continue
+            query+="?_a"
+            for i in range(cur_path_length):
+                var="?_"+str(cur_path_length)+"_"+str(i)
+                query+=" !a "+var+"."+var
+            query+=" <"+q_predicate+"> ?_b.}"
 
-                try:
-                    print "trying: ",(na_p,na),(nb,nb_p)
-                    shpath_l,shpath=dijkstra_path_2(self.db_graph, na, nb,weight='weight')
-                    print "done"
-                except:
-                    print "failed"
-                    continue
-                if not minshpath or shpath_l<minshpath:
-                    # Minimum path
-                    minshpath=shpath
-                    minshpath_l=shpath_l
+            ask_query="ASK "+query
+            select_query="SELECT DISTINCT ?_a ?_b WHERE "+query
 
-                    # Determine final inner nodes nis and nit.
-                    nis=na
-                    nis_p=na_p
-                    nit=nb
-                    nit_p=nb_p
-                    print nis
-                    print nit
+            # execute ASK query
+            has_results=None
 
-                    # Get the weights of these 2 edges
-                    nisw=self.db_graph[q_source][nis][nis_p]['weight']
-                    nitw=self.db_graph[nit][q_target][nit_p]['weight']
-                    FINISH_FLAG = True
-                    break
-            if FINISH_FLAG: break
+            # time ASK query
+            print 'ASK'
+            #print "    ",ask_query
+            time_ask = datetime.datetime.now()
+            has_results=requests.post(endpoint,{'timeout':'0','format':'text/plain','query': ask_query})
+            time_ask = datetime.datetime.now()-time_ask
+            time_ask=time_ask.total_seconds()
+            ask_time_total+=time_ask
 
-        if not minshpath:
+            print "has_results=",has_results.text
+            if has_results.text=="true":
+                # execute SELECT query
+                results=None
+
+                # time SELECT query
+                print 'SELECT'
+                print "    ",select_query
+                time_select = datetime.datetime.now()
+                results=requests.post(endpoint,{'timeout':'0','format':'application/sparql-results+json','query': select_query})
+                time_select = datetime.datetime.now()-time_select
+                time_select=time_select.total_seconds()
+                select_time_total+=time_select
+
+                results_dict=json.loads(results.text)
+                print "Results=",results_dict
+
+                # count results
+                results_number = len(results_dict['results']['bindings'])
+                print "Results number=",results_number
+                print "Remaining results=",remainingresults
+
+                if results_number >=remainingresults:
+                    #add limit to the last select query: LIMIT remainingresults
+                    select_query+='LIMIT '+str(remainingresults)
+
+                    # append query
+                    info_list.append((cur_path_length,select_query,ask_query,time_ask,time_select))
+                    print "Limit reached, breaking"
+                    break   # q_limit reached
+                else:
+                    # append query
+                    info_list.append((cur_path_length,select_query,ask_query,time_ask,time_select))
+                    remainingresults-=results_number
+                    print "Limit not reached, continuing, remaining results=",remainingresults
+            cur_path_length+=1
+        if not info_list:
             print "No connectivity between given RDF types."
-            return None,None,None,None,"No connectivity between given RDF types."
+            return None,None,None,None,None,"No connectivity between given RDF types."
+        else:
+            COMBINED_SELECT_SPARQL="SELECT * {"
+            for row in info_list:
+                COMBINED_SELECT_SPARQL+="{"+row[1]+"}UNION"
+            COMBINED_SELECT_SPARQL=COMBINED_SELECT_SPARQL[:-5]+"}"
 
-        totalpath=[q_source,(q_source,nis_p,nis)]+minshpath+[(nit,nit_p,q_target),q_target]
-        totalpathcost=nisw+nitw+minshpath_l
+            # duration of query processing
+            search_time = datetime.datetime.now()-search_time
+            search_time=search_time.total_seconds()
+            print COMBINED_SELECT_SPARQL
+            # COMBINED_SELECT_SPARQL,PATHS,PATH_LENGTHS,TIME_ASK,TIME_SELECT,TOTAL_TIME
+            return COMBINED_SELECT_SPARQL,info_list,ask_time_total,select_time_total,search_time,None
 
-        # Generate SPARQL for path.
-        spql = get_sparql_from_graph(totalpath,tdelimiter=self.tdelimiter)
+    def execute_query(self,q_source,q_predicate,q_target,q_limit,endpoint='http://localhost:8890/sparql'):
+        '''Queries db and returns results.
+        '''
+        search_time = datetime.datetime.now()
 
-        # duration of query processing
-        search_time = datetime.datetime.now() - search_time
+        print "Executing query:"
+        print q_source,q_predicate,q_target
 
-        return spql,totalpath,totalpathcost,search_time.total_seconds(),None
+        # blacklist of edges in the form (n1,p,n2)
+        g_source_removed=set([(e[0],e[2],e[1]) for e in self.db_graph.out_edges_iter([q_source],data=False, keys=True) if e[2] != q_predicate])
+        g_target_removed=set([(e[0],e[2],e[1]) for e in self.db_graph.in_edges_iter([q_target],data=False, keys=True) if e[2] == q_predicate])
+        g_source_removed2=set([(e[0],e[2],e[1]) for e in self.db_graph.out_edges_iter([q_source],data=False, keys=True) if e[2] == q_predicate])
+        g_target_removed2=set([(e[0],e[2],e[1]) for e in self.db_graph.in_edges_iter([q_target],data=False, keys=True) if e[2] != q_predicate])
+
+        pathgen1 = YenKSP_generator(self.db_graph,q_source,q_target,g_source_removed|g_target_removed)
+        pathgen2 = YenKSP_generator(self.db_graph,q_source,q_target,g_source_removed2|g_target_removed2)
+
+        generators=[pathgen1,pathgen2]
+        generatedvalues=[]
+
+        for g in generators:
+            try:
+                length,path=g.next()
+                heappush(generatedvalues, (length,(path,g)))
+            except StopIteration:
+                print 'Generator finished: ',g
+                pass
+
+        info_list=[]
+        remainingresults = q_limit
+        results_sorted=[]
+        resultset=set()
+        ask_time_total=0.0 # measures total ask time
+        select_time_total=0.0 # measures total ask time
+        while generatedvalues:
+            print "****************************************"
+            # get new shortest path
+            curlength,(curspath,curpathgen)=heappop(generatedvalues)
+
+            #do job
+            print "Using generator: ",curpathgen
+            print "Path Length: ",curlength
+            print "Path : ",curspath
+
+            assert curspath[-2][1]==q_predicate
+            assert curspath[0]==q_source
+            assert curspath[-1]==q_target
+
+            # integer path length (edge count)
+            int_path_length=len(curspath)/2
+            print "Int Path length: ",int_path_length
+
+            #convert spath to an ASK query and a SELECT query
+            ask_query,select_query,last_var = get_sparql_from_path(curspath)
+
+            # execute ASK query
+            has_results=None
+
+            # time ASK query
+            print 'ASK'
+            print "    ",ask_query
+            time_ask = datetime.datetime.now()
+            has_results=requests.post(endpoint,{'timeout':'0','format':'text/plain','query': ask_query})
+            time_ask = datetime.datetime.now()-time_ask
+            time_ask=time_ask.total_seconds()
+            ask_time_total+=time_ask
+
+            print "has_results=",has_results.text
+            if has_results.text=="true":
+                # execute SELECT query
+                results=None
+
+                # time SELECT query
+                print 'SELECT'
+                print "    ",select_query
+                time_select = datetime.datetime.now()
+                results=requests.post(endpoint,{'timeout':'0','format':'application/sparql-results+json','query': select_query})
+                time_select = datetime.datetime.now()-time_select
+                time_select=time_select.total_seconds()
+                select_time_total+=time_select
+
+                results_dict=json.loads(results.text)
+
+                # Results of this select query (may contain less unique results).
+                cur_results=[(b['_1']['value'],b[last_var[1:]]['value']) for b in results_dict['results']['bindings']]
+
+                # add results to list and mark last index for the limit
+                limit=0
+                for i,r in enumerate(cur_results):
+                    print "results_sorted: ",results_sorted
+                    print "resultset: ",resultset
+                    print "current result:",r
+                    if r not in resultset:
+                        results_sorted.append((int_path_length,r[0],r[1]))
+                        resultset.add(r)
+                        limit=i+1
+                        remainingresults-=1
+                        if remainingresults==0:
+                            #add limit to the last select query: LIMIT remainingresults
+                            select_query+='LIMIT '+str(limit)
+
+                            # append query
+                            info_list.append((curspath,curlength,select_query,ask_query,time_ask,time_select))
+                            print "Limit reached, breaking"
+                            break
+
+                if remainingresults==0:
+                    print "Limit reached, breaking"
+                    break
+                else:
+                    print "Limit not reached, continuing, remaining results=",remainingresults
+
+            # advance
+            try:
+                curlength,curpath=curpathgen.next()
+                heappush(generatedvalues, (curlength,(curpath,curpathgen)))
+            except StopIteration:
+                print 'Generator finished: ',curpathgen
+
+        if not info_list:
+            print "No connectivity between given RDF types."
+            return None,None,None,None,None,"No connectivity between given RDF types."
+        else:
+            COMBINED_SELECT_SPARQL="SELECT * {"
+            for row in info_list:
+                COMBINED_SELECT_SPARQL+="{"+row[2]+"}UNION"
+            COMBINED_SELECT_SPARQL=COMBINED_SELECT_SPARQL[:-5]+"}"
+
+            # duration of query processing
+            search_time = datetime.datetime.now()-search_time
+            search_time=search_time.total_seconds()
+            print COMBINED_SELECT_SPARQL
+            # COMBINED_SELECT_SPARQL,PATHS,PATH_LENGTHS,TIME_ASK,TIME_SELECT,TOTAL_TIME
+            return COMBINED_SELECT_SPARQL,info_list,ask_time_total,select_time_total,search_time,None

@@ -1,0 +1,7 @@
+set terminal postscript eps size 3.5,2.62 enhanced color font 'Helvetica,16' linewidth 2
+set title 'Probability Distribution'
+set output filename.'.eps'
+set xlabel 'instance degree'
+set ylabel 'Probability'
+set xrange [0:35]
+plot filename using 1:2 axes x1y1 with boxes lc rgb"green" notitle

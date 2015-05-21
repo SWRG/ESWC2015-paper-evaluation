@@ -1,92 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-This library contains various needed functions.
-
-:author: Spyridon Kazanas
-:contact: s.kazanas@gmail.com
-"""
-import networkx as nx
-from dijkstra import *
-from heapq import heappush, heappop
-
-unknown_class_name="u"
-
-def get_sparql_from_path(path):
-    '''
-    Path to SPARQL converter.
-
-    :param path: The path to be converted to sparql.
-    :param hard_limit: The total number of results of all queries.
-    :returns: A string with SPARQL code.
-    '''
-
-    def add_triple_pattern(sparql_var,rdf_type):
-        if sparql_var not in added_patterns:
-            added_patterns[sparql_var] = set()
-        added_patterns[sparql_var].add(rdf_type)
-        return
-
-    def add_conn_pattern(sparql_var_1,predicate,sparql_var_2):
-        if (sparql_var_1,sparql_var_2) not in added_conn_patterns:
-            added_conn_patterns[(sparql_var_1,sparql_var_2)] = set()
-        added_conn_patterns[(sparql_var_1,sparql_var_2)].add(predicate)
-        return
-
-    added_patterns = {}
-    added_conn_patterns = {}
-    sn=1
-
-    # Sequential iteration over path's edges.
-    for edge in path[1::2]:
-
-        (source,predicate,target) = edge
-        s_var="?_"+str(sn)
-        sn+=1
-        t_var="?_"+str(sn)
-
-        # Check if node is typed
-        if type(source) is frozenset:
-            for s in source: 
-                add_triple_pattern(s_var,s)
-
-        # Check if node is typed
-        if type(target) is frozenset:
-            for t in target:
-                add_triple_pattern(t_var,t)
-
-        # connect s_var to t_var with predicate
-        add_conn_pattern(s_var,predicate,t_var)
-        last_var=t_var
-
-    # string to be filled with sparql triple patterns
-    triplepatterns = ""
-
-    # concatenate rdf type triple patterns
-    for sparql_var in added_patterns:
-        rdftypes = added_patterns[sparql_var]
-        for rdftype in rdftypes:
-            triplepatterns += sparql_var + " a <" + rdftype + "> . "
-
-    # concatenate subject to object connection triple patterns
-    for (sparlq_var_1,sparql_var_2) in added_conn_patterns:
-        predicates = added_conn_patterns[(sparlq_var_1,sparql_var_2)]
-        for predicate in predicates:
-            triplepatterns +=  sparlq_var_1 + " <" + predicate + "> " + sparql_var_2 + " . "
-
-    # we are going to use select *
-    var_str = "*"
-
-    select_query = "".join([
-                "SELECT DISTINCT " + var_str + " WHERE { ",
-                triplepatterns,
-                "}"])
-
-    ask_query = "".join([
-                "ASK { ",
-                triplepatterns,
-                "}"])
-    return ask_query,select_query,last_var
-
 def get_path_length(G, path, weight='weight'):
     length = 0
     if len(path) > 1:
@@ -103,8 +14,8 @@ def YenKSP_generator(Graph, source, sink, blacklist, weight='weight'):
     This is an implementation of Yen's K-Shortest Paths Algorithm, based on 
     Antonin Lenfant's work for the igraph library (see https://gist.github.com/ALenfant)
 
-    :param Graph: The graph to be searched.
-    :type Graph: networkx.MultiDiGraph()
+    :param inGraph: The graph to be searched.
+    :type inGraph: networkx.MultiDiGraph()
     :param source: Starting node.
     :param sink: Ending node.
     :param weight: The key in edge's attribute dict corresponding to edge weights.
@@ -255,11 +166,10 @@ def YenKSP_generator(Graph, source, sink, blacklist, weight='weight'):
             removed_edges.add((u,key,v))
 
     # Determine the shortest path from the source to the sink.
-    l0,p0 = single_source_dijkstra_2(Graph,source,target=sink,blacklist=blacklist,weight=weight)
+    l0,p0 = single_source_dijkstra_2(Graph,source,sink,blacklist,weight=weight)
 
     if sink not in l0:
-        #raise nx.NetworkXNoPath("node %s not reachable from %s" % (source, sink))
-        return
+        raise nx.NetworkXNoPath("node %s not reachable from %s" % (source, sink))
 
     A = [p0[sink]]
     A_costs = [l0[sink]]
@@ -301,12 +211,12 @@ def YenKSP_generator(Graph, source, sink, blacklist, weight='weight'):
                 remove_node(rootPathNode)
 
             # Calculate the spur path from the spur node to the sink.
-            spurPathlength,spurPath = single_source_dijkstra_2(Graph, spurNode, target=sink,blacklist=blacklist | removed_edges,weight=weight)
+            spurPathlength,spurPath = single_source_dijkstra_2(Graph, spurNode, sink,blacklist | removed_edges,weight=weight)
 
             if sink in spurPath and spurPath[sink]:
                 # Entire path is made up of the root path and spur path.
                 totalPath = rootPath[:-1] + spurPath[sink] # last item of rootPath equals first item of spurPath, so we remove it to respect path continuity after the merging.
-                totalPathlength = get_path_length(Graph,rootPath)+spurPathlength[sink]
+                totalPathlength = get_path_length(inGraph,rootPath)+spurPathlength[sink]
                 heappush(B, (totalPathlength, totalPath))
 
             # clear list of removed edges

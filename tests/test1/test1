@@ -1,0 +1,20 @@
+import networkx as nx
+
+edges=[(1, 2, 'p2', {'weight': 0.2, 'label':'p2'}),
+ (1, 2, 'p3', {'weight': 0.3, 'label':'p3'}),
+ (1, 2, 'p1', {'weight': 0.1, 'label':'p1'}),
+ (2, 1, 'p3', {'weight': 0.21, 'label':'p3'}),
+ (2, 3, 'p4', {'weight': 0.21, 'label':'p4'}),
+ (2, 3, 'p5', {'weight': 0.421, 'label':'p5'}),
+ (3, 4, 'p6', {'weight': 0.6, 'label':'p6'}),
+ (4, 9, 'p1', {'weight': 1.6, 'label':'p1'}),
+ (9, 8, 'p2', {'weight': 1.6, 'label':'p2'}),
+ (3, 5, 'p7', {'weight': 0.3, 'label':'p7'}),
+ (3, 6, 'p7', {'weight': 0.1, 'label':'p7'}),
+ (5, 8, 'p3', {'weight': 0.4, 'label':'p3'}),
+ (6, 1, 'p1', {'weight': 0.1, 'label':'p1'})]
+
+G=nx.MultiDiGraph()
+
+for e in edges:
+    G.add_edge(e[0],e[1],e[2],e[3])

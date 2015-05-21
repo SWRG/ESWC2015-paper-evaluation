@@ -7,7 +7,7 @@ specified N-triples file. The output graph is saved in the same directory.
 :contact: s.kazanas@gmail.com
 """
 import RDF,argparse,os,sys
-import csv,cPickle,datetime
+import networkx as nx
 
 def findtypes(u):
     """
@@ -23,13 +23,21 @@ def findtypes(u):
         return None
     return types[u]
 
+def getunknownname(p):
+    if p not in uname:
+        uname[p] = (unknown_class_name,len(uname))
+    return uname[p]
+
 # RDF type delimiter in composite nodes
 tdelimiter='^'
 
-unknown_class_name="u"
+unknown_class_name="unknown"
 rdftype="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 uname = {}
 types={}
+
+# final graph
+g = nx.MultiDiGraph()
 
 # substitutions_dict[(st,p,ot)] = number_of_replaced_triples
 substitutions_dict = dict()
@@ -55,9 +63,7 @@ if __name__ == '__main__':
         sys.exit('-1')
 
     output_dir = os.path.dirname(os.path.abspath(os.path.expanduser(args.inputfile)))
-    output_file = os.path.join(output_dir,os.path.split(os.path.splitext(inputfile)[0])[1]+'.summary')
-
-    time_start=datetime.datetime.now()
+    output_file = os.path.join(output_dir,os.path.split(os.path.splitext(inputfile)[0])[1]+'.edgelist')
 
     # First Pass: Type dictionary creation.
     ERDF=0
@@ -85,7 +91,7 @@ if __name__ == '__main__':
             st_set = findtypes(item[0])
             if st_set is None:
                 # untyped node
-                st = (unknown_class_name,item[0])
+                st = getunknownname(item[1])
             else:
                 # typed node
                 st = st_set
@@ -94,7 +100,7 @@ if __name__ == '__main__':
             ot_set = findtypes(item[2])
             if ot_set is None:
                 # untyped node
-                ot = (unknown_class_name,item[2])
+                ot = getunknownname(item[1])
             else:
                 # typed node 
                 ot = ot_set
@@ -108,24 +114,21 @@ if __name__ == '__main__':
 
     # Weighting Step
     print "Weighting."
-    NR_int=sum((v for k,v in substitutions_dict.iteritems()))
+    NR_int=sum((substitutions_dict[k] for k in substitutions_dict))
     NR=float(NR_int)
     N=float(len(substitutions_dict))
 
+    # Add substitutions from the dict
+    for (st,p,ot) in substitutions_dict:
+        Nc=substitutions_dict[(st,p,ot)]
+        Ws=(1+(1-Nc/NR)/(N-1))/(N+1)
+
+        # the predicate p is the edge's unique key among all edges with the same end-nodes
+        g.add_edge(st,ot,p,{'label':p,'weight':Ws})
+
     # save data
     print "Saving data."
-    total_edges=0
-    total_weight=0.0
-    with open(output_file,'wb') as f:
-        csvriter = csv.writer(f,delimiter=' ')
-        for (st,p,ot), Nc in substitutions_dict.iteritems():
-            Ws=(1+(1-Nc/NR)/(N-1))/(N+1)
-
-            # the predicate p is the edge's unique key among all edges with the same end-nodes
-            #csvriter.writerow([st,ot,p,Ws])
-            csvriter.writerow([cPickle.dumps((st,ot,p,{'weight':Ws,'label':p}))])
-            total_edges+=1
-            total_weight+=Ws
+    nx.write_edgelist(g, open(output_file,'wb'), data=True)
 
     # Report
     print "REPORT"
@@ -134,10 +137,9 @@ if __name__ == '__main__':
     print "    Total RDF Connection Edges |E_2|=",NR_int
     print ""
     print "  RDF-TYPE SUMMARY:"
-    print "    Total Edges |E_S|=",total_edges
-    print "    Total Weight Sum(W_S)=",total_weight
+    print "    Total Nodes |N_S|=",len(g.nodes())
+    print "    Total Edges |E_S|=",len(g.edges())
+    print "    Total Weight Sum(W_S)=",sum((e[2]['weight'] for e in g.edges_iter(data=True)))
 
 
     print "RDF-type summary graph file created: " + output_file
-    time_duration=datetime.datetime.now()-time_start
-    print "Total time: ",time_duration.total_seconds(),"sec"
